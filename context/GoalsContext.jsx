@@ -1,4 +1,3 @@
-
 import { addDoc, collection } from "firebase/firestore"
 import { createContext, useState } from "react"
 import { db } from "../firebaseConfig"
@@ -30,4 +29,3 @@ export function GoalsProvider({ children }) {
     </GoalsContext.Provider>
   )
 }
-

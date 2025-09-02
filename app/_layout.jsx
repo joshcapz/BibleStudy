@@ -1,14 +1,44 @@
-import { Stack } from "expo-router"
-import { StatusBar } from "expo-status-bar"
+import { Tabs } from 'expo-router'
+import { Ionicons } from "@expo/vector-icons"
+import { GoalsProvider } from '../../contexts/GoalsContext'
 
-export default function RootLayout() {
+export default function GoalsLayout() {
+
   return (
-    <>
-      <StatusBar style="auto" />
-      <Stack>
-        <Stack.Screen name="goals" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </>
+    <GoalsProvider>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: 'black',
+          tabBarInactiveTintColor: 'grey',
+        }}>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: 'Your Goals',
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                size={24}
+                name={focused ? 'home' : 'home-outline'}
+                color="black"
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="create"
+          options={{
+            title: 'Create Goal',
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                size={24}
+                name={focused ? 'create' : 'create-outline'}
+                color="black"
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </GoalsProvider>
   )
 }
