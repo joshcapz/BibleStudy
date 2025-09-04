@@ -29,3 +29,4 @@ export function GoalsProvider({ children }) {
     </GoalsContext.Provider>
   )
 }
+
