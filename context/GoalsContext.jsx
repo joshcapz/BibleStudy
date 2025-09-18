@@ -1,4 +1,4 @@
-import { addDoc, collection } from "firebase/firestore"
+import { addDoc, collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore"
 import { createContext, useState } from "react"
 import { db } from "../firebaseConfig"
 
@@ -8,6 +8,9 @@ export function GoalsProvider({ children }) {
   const [goals, setGoals] = useState([])
 
   async function fetchGoals() {
+    const snapshot = await getDocs(collection(db, 'goals'));
+    const goalsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setGoals(goalsList);
   }
  
   async function createGoal(goalData) {
@@ -15,10 +18,14 @@ export function GoalsProvider({ children }) {
     await addDoc(collection(db, 'goals'), goalData)
   }
 
-  async function deleteGoal() {
+  async function deleteGoal(id) {
+    await deleteDoc(doc(db, 'goals', id));
+    setGoals(goals => goals.filter(goal => goal.id !== id));
   }
 
-  async function updateGoal() {
+  async function updateGoal(id, updatedData) {
+    await updateDoc(doc(db, 'goals', id), updatedData);
+    setGoals(goals => goals.map(goal => goal.id === id ? { ...goal, ...updatedData } : goal));
   }
 
   return (
