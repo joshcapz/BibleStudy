@@ -2,13 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCFMTJiEeVR_FXSUb7TSmgjsihlp19tT3s",
-  authDomain: "jgc-goal-tracker.firebaseapp.com",
-  projectId: "jgc-goal-tracker",
-  storageBucket: "jgc-goal-tracker.firebasestorage.app",
-  messagingSenderId: "375969020015",
-  appId: "1:375969020015:web:a9ef43664061df8d16f59a"
+  apiKey: "AIzaSyA__8MIG9TMi1q1Ensi6ik1fxA77R7Ra-I",
+  authDomain: "poker-80e13.firebaseapp.com",
+  projectId: "poker-80e13",
+  storageBucket: "poker-80e13.firebasestorage.app",
+  messagingSenderId: "1047389252647",
+  appId: "1:1047389252647:web:f88de8ee178a059317f202"
 };
 
 
