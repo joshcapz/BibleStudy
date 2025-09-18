@@ -4,6 +4,8 @@ import { GoalsProvider } from '../../context/GoalsContext'
 
 export default function GoalsLayout() {
 
+
+
   return (
     <GoalsProvider>
       <Tabs
@@ -12,10 +14,13 @@ export default function GoalsLayout() {
           tabBarActiveTintColor: 'black',
           tabBarInactiveTintColor: 'grey',
         }}>
+          
         <Tabs.Screen
           name="index"
           options={{
             title: 'Your Goals',
+            headerShown: false,
+            header: () => null,
             tabBarIcon: ({ focused }) => (
               <Ionicons
                 size={24}
@@ -25,6 +30,7 @@ export default function GoalsLayout() {
             ),
           }}
         />
+        
         <Tabs.Screen
           name="create"
           options={{

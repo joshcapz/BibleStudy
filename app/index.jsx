@@ -32,7 +32,7 @@ export default function Welcome() {
           letterSpacing: 2,
         }}
       >
-       𝐂𝐡𝐚𝐭𝐖𝐚𝐫𝐝𝐬
+       POKER
       </Text>
 
       {/* Tagline */}
@@ -44,7 +44,7 @@ export default function Welcome() {
           fontSize: 20,
         }}
       >
-        "𝙎𝙢𝙖𝙧𝙩 𝙘𝙝𝙖𝙩𝙨. 𝙎𝙚𝙖𝙢𝙡𝙚𝙨𝙨 𝙨𝙪𝙥𝙥𝙤𝙧𝙩. 𝙏𝙞𝙢𝙚 𝙬𝙚𝙡𝙡 𝙨𝙥𝙚𝙣𝙩."
+        "Play Poker anytime, anywhere—challenge friends or players worldwide!"
       </Text>
 
       {/* Login Button */}

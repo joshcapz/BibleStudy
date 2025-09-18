@@ -45,7 +45,7 @@ export default function Signup() {
       style={styles.container}
     >
       <Text style={styles.title}>𝐂𝐑𝐄𝐀𝐓𝐄 𝐀𝐂𝐎𝐔𝐍𝐓</Text>
-      <Text style={styles.subtitle}> 𝐉𝐎𝐈𝐍 𝐂𝐇𝐀𝐓𝐖𝐀𝐑𝐃𝐒 𝐓𝐎𝐃𝐀𝐘! 🔗</Text>
+      <Text style={styles.subtitle}> 𝐉𝐎𝐈𝐍 POKER 𝐓𝐎𝐃𝐀𝐘! 🔗</Text>
 
       <TextInput
         placeholder="Phone number/email"
