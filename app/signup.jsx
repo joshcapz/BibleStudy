@@ -9,18 +9,23 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
-import { useAuth } from '../../context/AuthContext';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig';
+import { useAuth } from '../context/AuthContext';
+
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [buttonText, setButtonText] = useState('Create Account');
+  const [successMessage, setSuccessMessage] = useState('');
+
   const { error, clearError } = useAuth();
   const router = useRouter();
 
@@ -52,15 +57,29 @@ export default function Signup() {
     if (!validateForm()) return;
 
     setLoading(true);
+    setButtonText('Saving...');
     clearError();
 
     try {
-      await createUserWithEmailAndPassword(auth, email.trim(), password);
-      Alert.alert(
-        'Success',
-        'Account created successfully! Please log in.',
-        [{ text: 'OK', onPress: () => router.replace('/auth/login') }]
-      );
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      const user = userCredential.user;
+
+      // Save user data to Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        uid: user.uid,
+        createdAt: new Date(),
+      });
+
+      setSuccessMessage('Saved');
+      setTimeout(() => {
+        setSuccessMessage('');
+        Alert.alert(
+          'Success',
+          'Account created successfully! Please log in.',
+          [{ text: 'OK', onPress: () => router.replace('/login') }]
+        );
+      }, 2000);
     } catch (err) {
       let errorMessage = 'Sign up failed. Please try again.';
 
@@ -84,7 +103,12 @@ export default function Signup() {
       Alert.alert('Sign Up Failed', errorMessage);
     } finally {
       setLoading(false);
+      setButtonText('Create Account');
     }
+  };
+
+  const handleSignInPress = () => {
+    router.push('/login');
   };
 
   return (
@@ -92,14 +116,26 @@ export default function Signup() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      {/* Background GIF */}
+      <Image
+        source={{
+          uri:
+            'https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWp1ZGMwZDB4NnM5Y2tiOXc0a2dxZG5iZTA3d2Z1eXN6NWppYW5r2aiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xT77Y1T0zY1gR5qe5O/giphy.gif',
+        }}
+        style={styles.backgroundGif}
+        resizeMode="cover"
+        blurRadius={2} // Optional, softens the background
+      />  
+
       <View style={styles.content}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Sign up to get started</Text>
+        <Text style={styles.title}>𝐂𝐫𝐞𝐚𝐭𝐞 𝐀𝐜𝐜𝐨𝐮𝐧𝐭</Text>
+        <Text style={styles.subtitle}>𝐒𝐢𝐠𝐧 𝐮𝐩 𝐭𝐨 𝐠𝐞𝐭 𝐬𝐭𝐚𝐫𝐭𝐞𝐝</Text>
 
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder="𝐄𝐦𝐚𝐢𝐥"
+            placeholderTextColor="#666"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -108,7 +144,8 @@ export default function Signup() {
           />
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder="𝐏𝐚𝐬𝐬𝐰𝐨𝐫𝐝"
+            placeholderTextColor="#666"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -116,7 +153,8 @@ export default function Signup() {
           />
           <TextInput
             style={styles.input}
-            placeholder="Confirm Password"
+            placeholder="𝐂𝐨𝐧𝐟𝐢𝐫𝐦 𝐏𝐚𝐬𝐬𝐰𝐨𝐫𝐝"
+            placeholderTextColor="#666"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -124,9 +162,7 @@ export default function Signup() {
           />
         </View>
 
-        {error && (
-          <Text style={styles.errorText}>{error}</Text>
-        )}
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
@@ -136,13 +172,19 @@ export default function Signup() {
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.buttonText}>Create Account</Text>
+            <Text style={styles.buttonText}>{buttonText}</Text>
           )}
         </TouchableOpacity>
 
+        {successMessage ? (
+          <View style={styles.successOverlay}>
+            <Text style={styles.successText}>{successMessage}</Text>
+          </View>
+        ) : null}
+
         <TouchableOpacity
           style={styles.linkButton}
-          onPress={() => router.push('/auth/login')}
+          onPress={handleSignInPress}
         >
           <Text style={styles.linkText}>
             Already have an account? <Text style={styles.linkTextBold}>Sign In</Text>
@@ -160,13 +202,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  backgroundGif: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    opacity: 0.3,
+  },
   content: {
     width: '100%',
-    maxWidth: 500, // Regular PC/Tablet width
+    maxWidth: 400,
     paddingHorizontal: 24,
-    flex: 1,
+    height: 500,
     justifyContent: 'center',
-    backgroundColor: '#911111',
+    backgroundColor: 'rgba(8, 4, 38, 0.7)',
     borderRadius: 20,
     margin: 20,
     shadowColor: '#000',
@@ -181,7 +231,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#00AB53',
     textAlign: 'center',
     marginBottom: 8,
   },
@@ -210,6 +260,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
+    color: '#000',
   },
   errorText: {
     color: '#FF2D55',
@@ -217,8 +268,26 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 14,
   },
+  successOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  successText: {
+    color: '#00AB53',
+    fontSize: 24,
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 20,
+    borderRadius: 10,
+  },
   button: {
-    backgroundColor: '#2D8CFF',
+    backgroundColor: '#4B0069',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -248,7 +317,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   linkTextBold: {
-    color: '#2D8CFF',
+    color: '#4B0069',
     fontWeight: '600',
   },
 });

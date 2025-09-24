@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,20 +9,55 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  Dimensions,
+  Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
-import { useAuth } from '../../context/AuthContext';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import { useAuth } from '../context/AuthContext';
 
-export default function Signup() {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { error, clearError } = useAuth();
   const router = useRouter();
+
+  // 🎨 Rainbow color + sway animation
+  const colorAnim = useRef(new Animated.Value(0)).current;
+  const moveAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Rainbow color animation
+    Animated.loop(
+      Animated.timing(colorAnim, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: false,
+      })
+    ).start();
+
+    // Sway left and right
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(moveAnim, {
+          toValue: 10,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(moveAnim, {
+          toValue: -10,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const animatedColor = colorAnim.interpolate({
+    inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1],
+    outputRange: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'],
+  });
 
   const validateForm = () => {
     if (!email.trim()) {
@@ -37,51 +72,39 @@ export default function Signup() {
       Alert.alert('Error', 'Password must be at least 6 characters long');
       return false;
     }
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return false;
-    }
-    if (!confirmPassword.trim()) {
-      Alert.alert('Error', 'Please confirm your password');
-      return false;
-    }
     return true;
   };
 
-  const handleSignup = async () => {
+  const handleLogin = async () => {
     if (!validateForm()) return;
 
     setLoading(true);
     clearError();
 
     try {
-      await createUserWithEmailAndPassword(auth, email.trim(), password);
-      Alert.alert(
-        'Success',
-        'Account created successfully! Please log in.',
-        [{ text: 'OK', onPress: () => router.replace('/auth/login') }]
-      );
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      router.replace('/home');
     } catch (err) {
-      let errorMessage = 'Sign up failed. Please try again.';
+      let errorMessage = 'Login failed. Please try again.';
 
       switch (err.code) {
-        case 'auth/email-already-in-use':
-          errorMessage = 'An account with this email already exists.';
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email address.';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password.';
           break;
         case 'auth/invalid-email':
           errorMessage = 'Please enter a valid email address.';
           break;
-        case 'auth/weak-password':
-          errorMessage = 'Password is too weak. Please choose a stronger password.';
-          break;
-        case 'auth/operation-not-allowed':
-          errorMessage = 'Email/password accounts are not enabled.';
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed attempts. Please try again later.';
           break;
         default:
           errorMessage = err.message;
       }
 
-      Alert.alert('Sign Up Failed', errorMessage);
+      Alert.alert('Login Failed', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -93,13 +116,27 @@ export default function Signup() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Sign up to get started</Text>
+        {/* 🔥 Animated Title */}
+        <Animated.Text
+          style={[
+            styles.title,
+            {
+              color: animatedColor,
+              transform: [{ translateX: moveAnim }],
+            },
+          ]}
+        >
+          𝐁𝐨𝐨𝐤𝐋𝐢𝐟𝐞
+        </Animated.Text>
+        
+        <Text style={styles.subtitle}> 𝐒𝐢𝐠𝐧 𝐢𝐧 𝐭𝐨 𝐲𝐨𝐮𝐫 𝐚𝐜𝐜𝐨𝐮𝐧𝐭</Text>
+
+        <Text style={styles.subtitle}></Text>
 
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder="𝗘𝗺𝗮𝗶𝗹"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -108,44 +145,35 @@ export default function Signup() {
           />
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder="𝗽𝗮𝘀𝘀𝘄𝗼𝗿𝗱"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            autoComplete="password-new"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            autoComplete="password-new"
+            autoComplete="password"
           />
         </View>
 
-        {error && (
-          <Text style={styles.errorText}>{error}</Text>
-        )}
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleSignup}
+          onPress={handleLogin}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.buttonText}>Create Account</Text>
+            <Text style={styles.buttonText}>Sign In</Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.linkButton}
-          onPress={() => router.push('/auth/login')}
+          onPress={() => router.push('/signup')}
         >
           <Text style={styles.linkText}>
-            Already have an account? <Text style={styles.linkTextBold}>Sign In</Text>
+            Don't have an account?{' '}
+            <Text style={styles.linkTextBold}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -162,11 +190,11 @@ const styles = StyleSheet.create({
   },
   content: {
     width: '100%',
-    maxWidth: 500, // Regular PC/Tablet width
+    maxWidth: 400,
     paddingHorizontal: 24,
-    flex: 1,
+    height: 500,
     justifyContent: 'center',
-    backgroundColor: '#911111',
+    backgroundColor: 'rgba(8, 4, 38, 0.7)',
     borderRadius: 20,
     margin: 20,
     shadowColor: '#000',
@@ -181,9 +209,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
     textAlign: 'center',
     marginBottom: 8,
+    // Removed static color to allow animation
   },
   subtitle: {
     fontSize: 16,
@@ -218,7 +246,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   button: {
-    backgroundColor: '#2D8CFF',
+    backgroundColor: '#4B0069',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -248,7 +276,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   linkTextBold: {
-    color: '#2D8CFF',
+    color: '#4B0069',
     fontWeight: '600',
   },
 });

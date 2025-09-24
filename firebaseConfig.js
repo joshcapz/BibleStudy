@@ -2,17 +2,17 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyA__8MIG9TMi1q1Ensi6ik1fxA77R7Ra-I",
-  authDomain: "poker-80e13.firebaseapp.com",
-  projectId: "poker-80e13",
-  storageBucket: "poker-80e13.firebasestorage.app",
-  messagingSenderId: "1047389252647",
-  appId: "1:1047389252647:web:f88de8ee178a059317f202"
+  apiKey: "AIzaSyAqWGvqN83wpXumsdwoCQd_a43hVu3iCvU",
+  authDomain: "booklife-98435.firebaseapp.com",
+  projectId: "booklife-98435",
+  storageBucket: "booklife-98435.firebasestorage.app",
+  messagingSenderId: "692413387213",
+  appId: "1:692413387213:web:52d45ca27c449ae7a13484"
 };
 
-
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);

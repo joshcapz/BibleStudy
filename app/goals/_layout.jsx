@@ -3,33 +3,15 @@ import { Ionicons } from "@expo/vector-icons"
 import { GoalsProvider } from '../../context/GoalsContext'
 
 export default function GoalsLayout() {
-
-
-
   return (
     <GoalsProvider>
       <Tabs
+        initialRouteName="create" // Set "create" as the default route
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: 'black',
           tabBarInactiveTintColor: 'grey',
         }}>
-          
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Your Goals',
-            headerShown: false,
-            header: () => null,
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                size={24}
-                name={focused ? 'home' : 'home-outline'}
-                color="black"
-              />
-            ),
-          }}
-        />
         
         <Tabs.Screen
           name="create"
@@ -48,5 +30,3 @@ export default function GoalsLayout() {
     </GoalsProvider>
   )
 }
-
-

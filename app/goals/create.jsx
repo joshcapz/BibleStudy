@@ -7,8 +7,8 @@ import { useRouter } from 'expo-router'
 const Create = () => {
   const [goal, setGoal] = useState('')
   const { createGoal } = useGoals()
-  const router = useRouter
- 
+  const router = useRouter()
+
   const handleSubmit = async () => {
     await createGoal({
       goal,
