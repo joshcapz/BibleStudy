@@ -43,12 +43,10 @@ export default function Login() {
         Animated.timing(moveAnim, {
           toValue: 10,
           duration: 2000,
-          useNativeDriver: true,
         }),
         Animated.timing(moveAnim, {
           toValue: -10,
           duration: 2000,
-          useNativeDriver: true,
         }),
       ])
     ).start();
@@ -126,7 +124,7 @@ export default function Login() {
             },
           ]}
         >
-          𝐁𝐨𝐨𝐤𝐋𝐢𝐟𝐞
+          𝐁𝐢𝐛𝐥𝐞𝐒𝐭𝐮𝐝𝐲
         </Animated.Text>
         
         <Text style={styles.subtitle}> 𝐒𝐢𝐠𝐧 𝐢𝐧 𝐭𝐨 𝐲𝐨𝐮𝐫 𝐚𝐜𝐜𝐨𝐮𝐧𝐭</Text>

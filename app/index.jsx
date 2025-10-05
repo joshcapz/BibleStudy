@@ -3,47 +3,56 @@ import { View, Text, TouchableOpacity, Platform, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 
+
 export default function Welcome() {
   const router = useRouter();
 
   useEffect(() => {
     if (Platform.OS === "web") {
-      document.title = "";
+      try {
+        // Check if document exists before accessing it
+        if (typeof document !== 'undefined') {
+          document.title = "";
 
-      // Add viewport meta tag for proper mobile scaling
-      let viewport = document.querySelector("meta[name=viewport]");
-      if (!viewport) {
-        viewport = document.createElement("meta");
-        viewport.setAttribute("name", "viewport");
-        document.head.appendChild(viewport);
-      }
-      viewport.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no");
+          // Add viewport meta tag for proper mobile scaling
+          let viewport = document.querySelector("meta[name=viewport]");
+          if (!viewport) {
+            viewport = document.createElement("meta");
+            viewport.setAttribute("name", "viewport");
+            document.head.appendChild(viewport);
+          }
+          viewport.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no");
 
-      // Add CSS to make page background match the gradient
-      let style = document.querySelector("#poker-background-style");
-      if (!style) {
-        style = document.createElement("style");
-        style.id = "poker-background-style";
-        document.head.appendChild(style);
+          // Add CSS to make page background match the gradient
+          let style = document.querySelector("#poker-background-style");
+          if (!style) {
+            style = document.createElement("style");
+            style.id = "poker-background-style";
+            document.head.appendChild(style);
+          }
+          style.textContent = `
+            body {
+              background: #4A90E2 !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              height: 100vh !important;
+              overflow: hidden !important;
+            }
+            html {
+              background: #4A90E2 !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              height: 100vh !important;
+            }
+            #root {
+              background: transparent !important;
+            }
+          `;
+        }
+      } catch (error) {
+        // Silently handle any DOM manipulation errors
+        // Error is intentionally ignored to prevent console warnings on mobile
       }
-      style.textContent = `
-        body {
-          background: #4A90E2 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          height: 100vh !important;
-          overflow: hidden !important;
-        }
-        html {
-          background: #4A90E2 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          height: 100vh !important;
-        }
-        #root {
-          background: transparent !important;
-        }
-      `;
     }
   }, []);
 
@@ -59,24 +68,12 @@ export default function Welcome() {
         minHeight: '100vh',
       }}
     >
-      {/* Background GIF */}
-      <Image
-        source={{ uri: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExYjVmanJpZjh5bW9jdXlxeDFsMndoOXh2cXcxMzUyYWJ6eGhpYWZqbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dqa3OzMQ4V3S6bjdpI/giphy.gif" }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          resizeMode: 'cover',
-          opacity: 0.3
-        }}
-      />
+
 
       {/* App Name */}
       <Text
         style={{
-          fontSize: 60,
+          fontSize: 40,
           fontWeight: "bold",
           color: "#8AFF8E",
           marginBottom: 30,
@@ -84,7 +81,7 @@ export default function Welcome() {
           textAlign: 'center',
         }}
       >
-          𝗕𝗼𝗼𝗸𝗟𝗶𝗳𝗲
+          𝐁𝐢𝐛𝐥𝐞𝐒𝐭𝐮𝐝𝐲
       </Text>
 
       {/* Tagline */}
@@ -98,7 +95,7 @@ export default function Welcome() {
           lineHeight: 28,
         }}
       >
-        𝐁𝐨𝐨𝐤𝐋𝐢𝐟𝐞 𝐢𝐬 𝐲𝐨𝐮𝐫 𝐜𝐨𝐦𝐩𝐚𝐧𝐢𝐨𝐧 𝐟𝐨𝐫 𝐭𝐫𝐚𝐜𝐤𝐢𝐧𝐠, 𝐝𝐢𝐬𝐜𝐨𝐯𝐞𝐫𝐢𝐧𝐠, 𝐚𝐧𝐝 𝐞𝐧𝐣𝐨𝐲𝐢𝐧𝐠 𝐛𝐨𝐨𝐤𝐬.
+        𝐁𝐢𝐛𝐥𝐞 𝐒𝐭𝐮𝐝𝐲 𝐡𝐞𝐥𝐩𝐬 𝐲𝐨𝐮 𝐫𝐞𝐚𝐝 𝐚𝐧𝐝 𝐫𝐞𝐟𝐥𝐞𝐜𝐭 𝐨𝐧 𝐆𝐨𝐝'𝐬 𝐖𝐨𝐫𝐝 𝐝𝐚𝐢𝐥𝐲.
       </Text>
 
       {/* Login Button */}

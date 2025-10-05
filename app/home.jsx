@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  Animated,
   ScrollView,
+  Modal,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -15,97 +16,80 @@ function HomeContent() {
   const { user, signOut } = useAuth();
   const router = useRouter();
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-  }, []);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      router.replace('/auth/login');
+      setMenuVisible(false);
+      router.replace('/login');
     } catch (error) {
       console.error('Sign out error:', error);
+      setMenuVisible(false);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
-        <Text style={styles.welcomeText}>🌟 Welcome to BookLife! 🌟</Text>
-        <Text style={styles.emailText}>Ready to dive into your book adventure, {user?.email}?</Text>
-      </Animated.View>
+    <LinearGradient
+      colors={["#2D8CFF", "#FF2D55"]}
+      style={{ flex: 1 }}
+    >
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.headerContent}>
+              <Text style={styles.welcomeText}>📖 Bible Study 📖</Text>
+              <Text style={styles.purposeText}>
+                Bible Study: Daily companion for spiritual growth through God's Word.
+                 Read, reflect, and apply Scripture. Begin with inspirational verses and explore books for reflection.
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.menuTrigger}
+              onPress={() => setMenuVisible(true)}
+            >
+              <Text style={styles.menuTriggerText}>☰</Text>
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.menuContainer}>
-        <TouchableOpacity
-          style={[styles.menuButton, styles.button1]}
-          onPress={() => router.push('/goals')}
-        >
-          <Text style={styles.menuButtonText}>📚 My Books</Text>
-          <Text style={styles.menuButtonSubtext}>Track and manage your books</Text>
-        </TouchableOpacity>
+          <View style={styles.menuContainer}>
+            <TouchableOpacity
+              style={[styles.menuButton, styles.button1]}
+              onPress={() => router.push('/daily')}
+            >
+              <Text style={styles.menuButtonText}>📖 Daily Verse</Text>
+              <Text style={styles.menuButtonSubtext}>Get today's inspirational Bible verse and reflection</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.menuButton, styles.button2]}
-          onPress={() => router.push('/profile')}
-        >
-          <Text style={styles.menuButtonText}>🚀 My Profile</Text>
-          <Text style={styles.menuButtonSubtext}>Customize your bookish identity</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.menuButton, styles.button2]}
+              onPress={() => router.push('/books')}
+            >
+              <Text style={styles.menuButtonText}>📚 Read Bible</Text>
+              <Text style={styles.menuButtonSubtext}>Explore books, chapters, and verses with highlights</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
 
-        <TouchableOpacity
-          style={[styles.menuButton, styles.button3]}
-          onPress={() => router.push('/goals')}
+        <Modal
+          visible={menuVisible}
+          transparent={true}
+          onRequestClose={() => setMenuVisible(false)}
+          animationType="fade"
         >
-          <Text style={styles.menuButtonText}>🔥 Discover Books</Text>
-          <Text style={styles.menuButtonSubtext}>Find your next favorite read</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.menuButton, styles.button4]}
-          onPress={() => router.push('/goals')}
-        >
-          <Text style={styles.menuButtonText}>⚡ Reading Challenges</Text>
-          <Text style={styles.menuButtonSubtext}>Level up your reading game</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.menuButton, styles.button5]}
-          onPress={() => router.push('/goals')}
-        >
-          <Text style={styles.menuButtonText}>🎉 Book Reviews</Text>
-          <Text style={styles.menuButtonSubtext}>Share your thoughts on books</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.menuButton, styles.button6]}
-          onPress={() => router.push('/challenges')}
-        >
-          <Text style={styles.menuButtonText}>⚡ Reading Challenges</Text>
-          <Text style={styles.menuButtonSubtext}>Level up your reading game</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.menuButton, styles.button7]}
-          onPress={() => router.push('/crud')}
-        >
-          <Text style={styles.menuButtonText}>🔧 CRUD Operations</Text>
-          <Text style={styles.menuButtonSubtext}>Create, Read, Update, Delete books</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.signOutButton}
-          onPress={handleSignOut}
-        >
-          <Text style={styles.signOutButtonText}>🚪 Sign Out</Text>
-        </TouchableOpacity>
+          <View style={styles.menuModal}>
+            <View style={styles.menuContent}>
+              <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+                <Text style={styles.signOutItemText}>Sign Out</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.closeButton} onPress={() => setMenuVisible(false)}>
+                <Text style={styles.closeItemText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </View>
-    </ScrollView>
+    </LinearGradient>
   );
 }
 
@@ -120,92 +104,125 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#F8F3FF',
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
   header: {
+    position: 'relative',
+    marginBottom: 30,
+  },
+  headerContent: {
     alignItems: 'center',
-    marginBottom: 40,
+    paddingHorizontal: 20,
   },
   welcomeText: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#4B0069',
-    marginBottom: 6,
+    marginBottom: 10,
   },
-  emailText: {
+  purposeText: {
     fontSize: 16,
-    color: '#888',
+    color: '#000',
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 10,
   },
   menuContainer: {
     flex: 1,
   },
   menuButton: {
     backgroundColor: '#fff',
-    padding: 22,
-    borderRadius: 14,
-    marginBottom: 20,
+    padding: 18,
+    borderRadius: 12,
+    marginBottom: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 6,
+    shadowRadius: 4,
+    elevation: 4,
   },
   button1: {
-    borderLeftWidth: 5,
+    borderLeftWidth: 4,
     borderLeftColor: '#00BFA5',
   },
   button2: {
-    borderLeftWidth: 5,
+    borderLeftWidth: 4,
     borderLeftColor: '#FFD700',
   },
-  button3: {
-    borderLeftWidth: 5,
-    borderLeftColor: '#FF5722',
-  },
-  button4: {
-    borderLeftWidth: 5,
-    borderLeftColor: '#9C27B0',
-  },
-  button5: {
-    borderLeftWidth: 5,
-    borderLeftColor: '#E91E63',
-  },
-  button6: {
-    borderLeftWidth: 5,
-    borderLeftColor: '#3F51B5',
-  },
-  button7: {
-    borderLeftWidth: 5,
-    borderLeftColor: '#FF9800',
-  },
   menuButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: '#333',
     marginBottom: 4,
   },
   menuButtonSubtext: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#777',
   },
-  signOutButton: {
-    backgroundColor: '#4B0069',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 5,
+  menuTrigger: {
+    position: 'absolute',
+    top: -10,
+    right: 20,
+    backgroundColor: 'transparent',
+    padding: 10,
   },
-  signOutButtonText: {
+  menuTriggerText: {
+    color: '#4B0069',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  menuModal: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  menuContent: {
+    padding: 10,
+    borderRadius: 8,
+    width: 200,
+    minHeight: 80,
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  signOutButton: {
+    backgroundColor: '#8B0000',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 7 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '100%',
+  },
+  closeButton: {
+    backgroundColor: '#4B0069',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '100%',
+  },
+  signOutItemText: {
+    fontSize: 14,
     color: '#fff',
-    fontSize: 16,
+    fontWeight: '600',
+  },
+  closeItemText: {
+    fontSize: 14,
+    color: '#fff',
     fontWeight: '600',
   },
 });
